@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fast&amp;SmartServices</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0d1f4e;
+      --white: #f4f9ff;
+      --accent: #0099ff;
+      --mid: #2a4080;
+      --light: #daeaf8;
+      --serif: 'Cormorant Garamond', Georgia, serif;
+      --sans: 'DM Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--white);
+      color: var(--black);
+      font-family: var(--sans);
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.4rem 4rem;
+      background: rgba(248,246,242,0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(0,0,0,0.07);
+      transition: padding 0.3s;
+    }
+    .nav-logo {
+      font-family: var(--serif);
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--black);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--accent); }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a {
+      text-decoration: none;
+      font-size: 0.82rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--mid);
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+
+    /* hamburger */
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; border: none; background: none; padding: 4px; }
+    .hamburger span { display: block; width: 24px; height: 1.5px; background: var(--black); transition: all 0.3s; }
+    .mobile-menu {
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--white); z-index: 99; flex-direction: column;
+      align-items: center; justify-content: center; gap: 2.5rem;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      font-family: var(--serif); font-size: 2.2rem; font-weight: 300;
+      text-decoration: none; color: var(--black); letter-spacing: -0.02em;
+      transition: color 0.2s;
+    }
+    .mobile-menu a:hover { color: var(--accent); }
+    .mobile-close {
+      position: absolute; top: 1.8rem; right: 2rem;
+      font-size: 2rem; background: none; border: none; cursor: pointer; color: var(--black);
+    }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      padding: 8rem 4rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 60% 70% at 75% 50%, rgba(0,153,255,0.08) 0%, transparent 70%),
+        linear-gradient(135deg, transparent 60%, rgba(0,87,184,0.05) 100%);
+    }
+    .hero-line {
+      position: absolute; top: 0; bottom: 0; left: 50%; width: 1px;
+      background: linear-gradient(to bottom, transparent, var(--accent) 30%, var(--accent) 70%, transparent);
+      opacity: 0.25;
+    }
+    .hero-left { position: relative; padding-right: 5rem; }
+    .hero-eyebrow {
+      font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 1.5rem;
+      opacity: 0; animation: fadeUp 0.8s 0.2s forwards;
+    }
+    .hero-title {
+      font-family: var(--serif);
+      font-size: clamp(3rem, 5vw, 5.5rem);
+      font-weight: 300;
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      margin-bottom: 2rem;
+      opacity: 0; animation: fadeUp 0.8s 0.4s forwards;
+    }
+    .hero-title em { font-style: italic; color: var(--accent); }
+    .hero-sub {
+      font-size: 1rem; line-height: 1.7; color: var(--mid);
+      max-width: 400px; margin-bottom: 3rem;
+      opacity: 0; animation: fadeUp 0.8s 0.6s forwards;
+    }
+    .hero-cta {
+      display: inline-flex; align-items: center; gap: 0.75rem;
+      text-decoration: none; font-size: 0.82rem;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--black);
+      opacity: 0; animation: fadeUp 0.8s 0.8s forwards;
+      transition: gap 0.3s;
+    }
+    .hero-cta:hover { gap: 1.2rem; }
+    .hero-cta-line {
+      width: 3rem; height: 1px;
+      background: var(--accent);
+      transition: width 0.3s;
+    }
+    .hero-cta:hover .hero-cta-line { width: 4rem; }
+
+    .hero-right {
+      display: flex; flex-direction: column; gap: 1.5rem;
+      padding-left: 3rem;
+      opacity: 0; animation: fadeIn 1s 1s forwards;
+    }
+    .hero-stat {
+      border-left: 2px solid var(--accent);
+      padding-left: 1.5rem;
+    }
+    .hero-stat-num {
+      font-family: var(--serif); font-size: 3rem; font-weight: 300;
+      line-height: 1; color: var(--black);
+    }
+    .hero-stat-label {
+      font-size: 0.78rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--mid); margin-top: 0.25rem;
+    }
+    .hero-scroll {
+      position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+      font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--mid); animation: bounce 2s infinite;
+    }
+    .scroll-arrow { width: 1px; height: 2rem; background: var(--accent); }
+
+    /* ── CHI SIAMO ── */
+    #chi-siamo {
+      padding: 8rem 4rem;
+      display: grid; grid-template-columns: 1fr 1.5fr; gap: 6rem;
+      align-items: center;
+      background: var(--black); color: var(--white);
+    }
+    .section-label {
+      font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 1rem;
+    }
+    .chi-title {
+      font-family: var(--serif); font-size: clamp(2rem, 3.5vw, 3.5rem);
+      font-weight: 300; line-height: 1.15; letter-spacing: -0.02em;
+    }
+    .chi-right p {
+      font-size: 1.05rem; line-height: 1.85; color: rgba(248,246,242,0.75);
+      margin-bottom: 1.5rem;
+    }
+    .chi-values {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 3rem;
+    }
+    .value-item {
+      padding: 1.5rem;
+      border: 1px solid rgba(200,169,110,0.25);
+      transition: border-color 0.3s;
+    }
+    .value-item:hover { border-color: var(--accent); }
+    .value-icon { font-size: 1.4rem; margin-bottom: 0.6rem; }
+    .value-name {
+      font-size: 0.82rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 0.4rem;
+    }
+    .value-desc { font-size: 0.88rem; color: rgba(248,246,242,0.6); line-height: 1.6; }
+
+    /* ── SERVIZI ── */
+    #servizi { padding: 8rem 4rem; }
+    .section-header { margin-bottom: 5rem; }
+    .section-header .section-label { color: var(--accent); }
+    .section-title {
+      font-family: var(--serif); font-size: clamp(2.2rem, 4vw, 4rem);
+      font-weight: 300; letter-spacing: -0.02em; line-height: 1.1;
+    }
+    .servizi-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
+      border: 1px solid var(--light);
+    }
+    .servizio {
+      padding: 3rem 2.5rem;
+      border-right: 1px solid var(--light);
+      position: relative; overflow: hidden;
+      transition: background 0.4s;
+    }
+    .servizio:last-child { border-right: none; }
+    .servizio::before {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+      background: var(--accent);
+      transform: scaleX(0); transform-origin: left;
+      transition: transform 0.4s;
+    }
+    .servizio:hover::before { transform: scaleX(1); }
+    .servizio:hover { background: #faf8f4; }
+    .serv-num {
+      font-family: var(--serif); font-size: 4rem; font-weight: 300;
+      color: var(--light); line-height: 1; margin-bottom: 1.5rem;
+      transition: color 0.4s;
+    }
+    .servizio:hover .serv-num { color: var(--accent); }
+    .serv-name {
+      font-family: var(--serif); font-size: 1.6rem; font-weight: 400;
+      margin-bottom: 1rem; line-height: 1.2;
+    }
+    .serv-desc { font-size: 0.9rem; color: var(--mid); line-height: 1.7; margin-bottom: 2rem; }
+    .serv-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .tag {
+      font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 0.3rem 0.7rem; border: 1px solid var(--light);
+      color: var(--mid); transition: border-color 0.3s, color 0.3s;
+    }
+    .servizio:hover .tag { border-color: var(--accent); color: var(--accent); }
+
+    /* ── BLOG ── */
+    #blog { padding: 8rem 4rem; background: var(--light); }
+    .blog-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 2rem; margin-top: 4rem; }
+    .post-card {
+      background: var(--white); padding: 2.5rem;
+      cursor: pointer; transition: transform 0.3s, box-shadow 0.3s;
+      border-bottom: 3px solid transparent;
+    }
+    .post-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+      border-bottom-color: var(--accent);
+    }
+    .post-cat {
+      font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 1rem;
+    }
+    .post-title {
+      font-family: var(--serif); font-size: 1.4rem; font-weight: 400;
+      line-height: 1.25; margin-bottom: 1rem; letter-spacing: -0.01em;
+    }
+    .post-excerpt { font-size: 0.88rem; color: var(--mid); line-height: 1.7; margin-bottom: 1.5rem; }
+    .post-meta { font-size: 0.75rem; color: #999; letter-spacing: 0.05em; }
+
+    /* ── CONTATTI ── */
+    #contatti {
+      padding: 8rem 4rem;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6rem;
+      align-items: start;
+    }
+    .contact-left .section-title { margin-bottom: 1.5rem; }
+    .contact-intro { font-size: 1rem; color: var(--mid); line-height: 1.7; margin-bottom: 3rem; }
+    .contact-info { display: flex; flex-direction: column; gap: 1.5rem; }
+    .contact-item { display: flex; align-items: center; gap: 1rem; }
+    .contact-icon {
+      width: 2.5rem; height: 2.5rem; border: 1px solid var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; color: var(--accent); flex-shrink: 0;
+    }
+    .contact-label { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mid); }
+    .contact-value { font-size: 0.95rem; color: var(--black); }
+
+    .contact-form { display: flex; flex-direction: column; gap: 1.5rem; }
+    .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+    .form-group label {
+      font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mid);
+    }
+    .form-group input, .form-group textarea {
+      border: none; border-bottom: 1px solid var(--light);
+      background: transparent; padding: 0.75rem 0;
+      font-family: var(--sans); font-size: 0.95rem; color: var(--black);
+      outline: none; transition: border-color 0.3s;
+    }
+    .form-group input:focus, .form-group textarea:focus { border-color: var(--accent); }
+    .form-group textarea { resize: vertical; min-height: 120px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .btn-submit {
+      align-self: flex-start;
+      padding: 1rem 2.5rem;
+      background: var(--black); color: var(--white);
+      border: none; cursor: pointer; font-family: var(--sans);
+      font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase;
+      transition: background 0.3s;
+    }
+    .btn-submit:hover { background: var(--accent); }
+    .form-note { font-size: 0.78rem; color: var(--mid); margin-top: 0.5rem; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--black); color: var(--white);
+      padding: 3rem 4rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .footer-logo {
+      font-family: var(--serif); font-size: 1.2rem; font-weight: 600;
+      color: var(--white); text-decoration: none;
+    }
+    .footer-logo span { color: var(--accent); }
+    .footer-text { font-size: 0.8rem; color: rgba(255,255,255,0.4); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50%       { transform: translateX(-50%) translateY(6px); }
+    }
+    .reveal {
+      opacity: 0; transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      nav { padding: 1.2rem 1.5rem; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      #hero { grid-template-columns: 1fr; padding: 7rem 1.5rem 4rem; }
+      .hero-left { padding-right: 0; }
+      .hero-right { display: none; }
+      .hero-line { display: none; }
+      #chi-siamo { grid-template-columns: 1fr; padding: 5rem 1.5rem; gap: 3rem; }
+      .chi-values { grid-template-columns: 1fr; }
+      #servizi { padding: 5rem 1.5rem; }
+      .servizi-grid { grid-template-columns: 1fr; }
+      .servizio { border-right: none; border-bottom: 1px solid var(--light); }
+      #blog { padding: 5rem 1.5rem; }
+      .blog-grid { grid-template-columns: 1fr; }
+      #contatti { grid-template-columns: 1fr; padding: 5rem 1.5rem; gap: 3rem; }
+      footer { flex-direction: column; gap: 1rem; padding: 2rem 1.5rem; text-align: center; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" onclick="toggleMenu()">✕</button>
+  <a href="#chi-siamo" onclick="toggleMenu()">Chi siamo</a>
+  <a href="#servizi" onclick="toggleMenu()">Servizi</a>
+  <a href="#blog" onclick="toggleMenu()">Blog</a>
+  <a href="#contatti" onclick="toggleMenu()">Contatti</a>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">Fast<span>&amp;</span>SmartServices</a>
+  <ul class="nav-links">
+    <li><a href="#chi-siamo">Chi siamo</a></li>
+    <li><a href="#servizi">Servizi</a></li>
+    <li><a href="#blog">Blog</a></li>
+    <li><a href="#contatti">Contatti</a></li>
+  </ul>
+  <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-line"></div>
+  <div class="hero-left">
+    <p class="hero-eyebrow">Consulenze Informatiche &amp; Formazione Online</p>
+    <h1 class="hero-title">
+      Il tuo partner<br><em>digitale,</em><br>sempre <em>smart.</em>
+    </h1>
+    <p class="hero-sub">
+      Il tuo partner virtuale per la crescita digitale. Soluzioni informatiche su misura per il tuo business e percorsi di formazione online per sviluppare competenze digitali concrete.
+    </p>
+    <a href="#servizi" class="hero-cta">
+      <span class="hero-cta-line"></span>
+      Scopri i servizi
+    </a>
+  </div>
+  <div class="hero-right">
+    <div class="hero-stat">
+      <div class="hero-stat-num">100%</div>
+      <div class="hero-stat-label">Percorsi personalizzati</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">Fast.</div>
+      <div class="hero-stat-label">Risultati misurabili e concreti</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">Smart.</div>
+      <div class="hero-stat-label">Approccio innovativo e agile</div>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-arrow"></div>
+    scroll
+  </div>
+</section>
+
+<!-- CHI SIAMO -->
+<section id="chi-siamo">
+  <div class="reveal">
+    <p class="section-label">Chi siamo</p>
+    <h2 class="chi-title">Esperienza che<br>genera valore<br><em style="font-style:italic; color:var(--accent)">reale.</em></h2>
+  </div>
+  <div class="chi-right reveal">
+    <p>Fast&amp;SmartServices è il tuo virtual tech partner: affianchiamo aziende e professionisti nel percorso di trasformazione digitale con consulenze informatiche personalizzate e formazione online professionale.</p>
+    <p>Velocità di intervento, soluzioni su misura e un approccio concreto: non vendiamo tecnologia, costruiamo competenze e processi che durano nel tempo.</p>
+    <div class="chi-values">
+      <div class="value-item">
+        <div class="value-icon">⚡</div>
+        <div class="value-name">Rapidità</div>
+        <div class="value-desc">Interveniamo con efficienza senza sacrificare la qualità.</div>
+      </div>
+      <div class="value-item">
+        <div class="value-icon">🎯</div>
+        <div class="value-name">Precisione</div>
+        <div class="value-desc">Ogni soluzione è calibrata sull'obiettivo specifico del cliente.</div>
+      </div>
+      <div class="value-item">
+        <div class="value-icon">🤝</div>
+        <div class="value-name">Fiducia</div>
+        <div class="value-desc">Costruiamo relazioni di lungo termine basate sulla trasparenza.</div>
+      </div>
+      <div class="value-item">
+        <div class="value-icon">💡</div>
+        <div class="value-name">Innovazione</div>
+        <div class="value-desc">Metodologie aggiornate alle esigenze del mercato attuale.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVIZI -->
+<section id="servizi">
+  <div class="section-header reveal">
+    <p class="section-label">Servizi</p>
+    <h2 class="section-title">Cosa possiamo<br>fare per te</h2>
+  </div>
+  <div class="servizi-grid reveal">
+    <div class="servizio">
+      <div class="serv-num">01</div>
+      <h3 class="serv-name">Consulenze Informatiche</h3>
+      <p class="serv-desc">Soluzioni su misura per il tuo business: analisi dei sistemi, ottimizzazione dei processi digitali e supporto tecnico continuativo per PMI e professionisti.</p>
+      <div class="serv-tags">
+        <span class="tag">Sistemi IT</span>
+        <span class="tag">Processi digitali</span>
+        <span class="tag">Supporto tecnico</span>
+      </div>
+    </div>
+    <div class="servizio">
+      <div class="serv-num">02</div>
+      <h3 class="serv-name">Formazione Online</h3>
+      <p class="serv-desc">Corsi online per sviluppare competenze digitali reali: dal problem solving informatico alla gestione dei dati, fino agli strumenti di produttività moderna.</p>
+      <div class="serv-tags">
+        <span class="tag">E-learning</span>
+        <span class="tag">Competenze digitali</span>
+        <span class="tag">Certificazioni</span>
+      </div>
+    </div>
+    <div class="servizio">
+      <div class="serv-num">03</div>
+      <h3 class="serv-name">Affiancamento Operativo</h3>
+      <p class="serv-desc">Non solo consulenza: siamo presenti nell'implementazione per garantire che le soluzioni tecnologiche funzionino davvero nella tua realtà operativa.</p>
+      <div class="serv-tags">
+        <span class="tag">Implementazione</span>
+        <span class="tag">Follow-up</span>
+        <span class="tag">Risultati misurabili</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BLOG -->
+<section id="blog">
+  <div class="section-header reveal">
+    <p class="section-label">Blog</p>
+    <h2 class="section-title">Idee &amp; Approfondimenti</h2>
+  </div>
+  <div class="blog-grid reveal">
+    <div class="post-card">
+      <p class="post-cat">Consulenza IT</p>
+      <h3 class="post-title">Come digitalizzare i processi aziendali senza bloccare l'operatività</h3>
+      <p class="post-excerpt">Un approccio graduale e sostenibile per introdurre strumenti digitali senza creare resistenza interna o interruzioni.</p>
+      <p class="post-meta">Aprile 2025</p>
+    </div>
+    <div class="post-card">
+      <p class="post-cat">Formazione</p>
+      <h3 class="post-title">Competenze digitali: perché i corsi generici non bastano più</h3>
+      <p class="post-excerpt">Come progettare percorsi formativi su misura che trasformano davvero le capacità del team e restano nel tempo.</p>
+      <p class="post-meta">Marzo 2025</p>
+    </div>
+    <div class="post-card">
+      <p class="post-cat">Tecnologia</p>
+      <h3 class="post-title">I 5 strumenti digitali che ogni PMI dovrebbe adottare subito</h3>
+      <p class="post-excerpt">Una selezione pratica di software e piattaforme che migliorano produttività, comunicazione e gestione del business.</p>
+      <p class="post-meta">Febbraio 2025</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONTATTI -->
+<section id="contatti">
+  <div class="contact-left reveal">
+    <p class="section-label">Contatti</p>
+    <h2 class="section-title">Parliamo<br>del tuo progetto</h2>
+    <p class="contact-intro">Sei pronto a fare il passo successivo? Scrivici o chiamaci — ti risponderemo entro 24 ore con una prima valutazione gratuita.</p>
+    <div class="contact-info">
+      <div class="contact-item">
+        <div class="contact-icon">✉</div>
+        <div>
+          <p class="contact-label">Email</p>
+          <!-- MODIFICA: inserisci la tua email -->
+          <p class="contact-value">info@fastsmartservices.it</p>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon">📍</div>
+        <div>
+          <p class="contact-label">Sede</p>
+          <!-- MODIFICA: inserisci la tua città -->
+          <p class="contact-value">Mantova, Italia</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="reveal">
+    <!-- Il form invia a Formspree — sostituisci YOUR_FORM_ID con l'ID del tuo form gratuito su formspree.io -->
+    <form class="contact-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="nome">Nome</label>
+          <input type="text" id="nome" name="nome" placeholder="Il tuo nome" required>
+        </div>
+        <div class="form-group">
+          <label for="azienda">Azienda</label>
+          <input type="text" id="azienda" name="azienda" placeholder="Nome azienda">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="tua@email.it" required>
+      </div>
+      <div class="form-group">
+        <label for="messaggio">Messaggio</label>
+        <textarea id="messaggio" name="messaggio" placeholder="Descrivi brevemente il tuo progetto o la tua esigenza..." required></textarea>
+      </div>
+      <button type="submit" class="btn-submit">Invia messaggio</button>
+      <p class="form-note">Risposta garantita entro 24 ore lavorative.</p>
+    </form>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a class="footer-logo" href="#">Fast<span>&amp;</span>SmartServices</a>
+  <p class="footer-text">© 2025 Fast&amp;SmartServices — Tutti i diritti riservati</p>
+</footer>
+
+<script>
+  // Mobile menu
+  function toggleMenu() {
+    document.getElementById('mobileMenu').classList.toggle('open');
+  }
+
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 120);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Nav shrink on scroll
+  window.addEventListener('scroll', () => {
+    document.querySelector('nav').style.padding =
+      window.scrollY > 60 ? '1rem 4rem' : '1.4rem 4rem';
+  });
+</script>
+</body>
+</html>
