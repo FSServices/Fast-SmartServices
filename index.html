@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fast&Smart Services | Consulenze informatiche e formazione</title>
+    <meta name="description" content="Fast&Smart Services: consulenze informatiche, formazione online, corsi PES/PAV/PEI (CEI 11-27) e corsi sulla sicurezza sul lavoro (D.Lgs. 81/08).">
+    <!-- Google Fonts: Montserrat & Rajdhani -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        :root {
+            --bg-dark: #0A0915;
+            --bg-card: rgba(22, 16, 48, 0.75);
+            --neon-cyan: #00F0FF;
+            --neon-magenta: #FF007A;
+            --celeste: #00C8FF;
+            --electric-blue: #3B82F6;
+            --text-main: #FFFFFF;
+            --text-muted: #C7D2FE;
+            --border-glow: rgba(255, 0, 122, 0.3);
+            --font-main: 'Montserrat', sans-serif;
+            --font-tech: 'Rajdhani', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; scroll-behavior: smooth; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        #webgl-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
+
+        .bg-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 30% 20%, rgba(255, 0, 122, 0.2) 0%, transparent 60%),
+                        radial-gradient(circle at 80% 80%, rgba(0, 240, 255, 0.18) 0%, transparent 50%);
+            z-index: 1; pointer-events: none;
+        }
+
+        .content-wrapper { position: relative; z-index: 2; }
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 2rem; }
+
+        /* Header */
+        header {
+            position: fixed; top: 0; width: 100%; z-index: 100;
+            background: rgba(10, 9, 21, 0.88);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 0, 122, 0.2);
+            padding: 0.8rem 0;
+        }
+        .nav-inner { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+
+        .logo {
+            display: flex; align-items: center; gap: 12px;
+            font-family: var(--font-tech); font-size: 1.7rem; font-weight: 700;
+            text-decoration: none; color: var(--text-main); letter-spacing: 1px;
+        }
+        .logo img { height: 46px; width: auto; border-radius: 10px; display: block; box-shadow: 0 0 14px rgba(0,240,255,0.35); }
+        .logo-fallback { display: none; align-items: center; gap: 12px; }
+        .logo-badge {
+            background: linear-gradient(135deg, var(--neon-magenta), var(--neon-cyan));
+            color: #FFFFFF; padding: 4px 10px; border-radius: 6px; font-weight: 800; font-size: 1.1rem;
+            box-shadow: 0 0 15px rgba(255, 0, 122, 0.5);
+        }
+
+        .nav-links { display: flex; gap: 2.2rem; list-style: none; }
+        .nav-links a { color: var(--text-muted); text-decoration: none; font-weight: 600; font-size: 0.98rem; transition: all 0.3s ease; }
+        .nav-links a:hover { color: var(--neon-cyan); text-shadow: 0 0 10px rgba(0, 240, 255, 0.8); }
+
+        .btn-cta {
+            background: linear-gradient(135deg, var(--neon-magenta), var(--neon-cyan));
+            color: #FFFFFF; padding: 0.75rem 1.8rem; border-radius: 8px; font-weight: 800;
+            text-decoration: none; font-family: var(--font-tech); font-size: 1.1rem; letter-spacing: 1px;
+            text-transform: uppercase; box-shadow: 0 0 25px rgba(255, 0, 122, 0.5);
+            transition: all 0.3s ease; border: none; cursor: pointer; display: inline-block;
+        }
+        .btn-cta:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 0 35px rgba(0, 240, 255, 0.8); }
+        .btn-cta:disabled { opacity: 0.6; cursor: wait; transform: none; }
+
+        /* Hero */
+        .hero { min-height: 100vh; display: flex; align-items: center; padding-top: 6rem; }
+        .hero-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 4rem; align-items: center; }
+
+        .hero-tag {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(255, 0, 122, 0.15); border: 1px solid var(--neon-magenta);
+            color: var(--neon-cyan); padding: 6px 16px; border-radius: 50px;
+            font-size: 0.85rem; font-weight: 700; margin-bottom: 1.5rem;
+            text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 0 15px rgba(255, 0, 122, 0.3);
+        }
+        .hero-title { font-size: 3.8rem; font-weight: 900; line-height: 1.1; margin-bottom: 1.5rem; color: #FFFFFF; }
+        .hero-title .magenta-text { background: linear-gradient(to right, var(--neon-magenta), var(--celeste)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero-title .cyan-text { background: linear-gradient(to right, var(--neon-cyan), #00A3FF); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero-desc { font-size: 1.15rem; color: var(--text-muted); margin-bottom: 2.5rem; max-width: 600px; }
+        .hero-actions { display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: center; }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05); color: var(--text-main);
+            border: 1px solid var(--neon-cyan); padding: 0.75rem 1.8rem; border-radius: 8px;
+            font-weight: 600; text-decoration: none; transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(0, 240, 255, 0.15); color: var(--neon-cyan); box-shadow: 0 0 20px rgba(0, 240, 255, 0.5); }
+
+        .hero-logo { display: flex; justify-content: center; }
+        .hero-logo img {
+            width: 100%; max-width: 380px; border-radius: 32px;
+            box-shadow: 0 0 40px rgba(0, 240, 255, 0.35), 0 0 80px rgba(255, 0, 122, 0.25);
+            border: 1px solid rgba(0, 240, 255, 0.4);
+            animation: floaty 6s ease-in-out infinite;
+        }
+        @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+
+        /* Section titles */
+        .section-header { text-align: center; margin-bottom: 4rem; }
+        .section-subtitle {
+            color: var(--neon-magenta); font-family: var(--font-tech); font-size: 1.2rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 2px; margin-bottom: 0.5rem;
+            text-shadow: 0 0 10px rgba(255, 0, 122, 0.5);
+        }
+        .section-title { font-size: 2.8rem; font-weight: 800; }
+
+        /* Servizi */
+        .services-section { padding: 8rem 0; }
+        .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; }
+        .service-card {
+            background: var(--bg-card); border: 1px solid var(--border-glow); border-radius: 16px;
+            padding: 2.5rem 2rem; backdrop-filter: blur(12px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; overflow: hidden;
+        }
+        .service-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+            background: linear-gradient(90deg, var(--neon-magenta), var(--neon-cyan));
+            opacity: 0; transition: opacity 0.3s ease;
+        }
+        .service-card:hover { transform: translateY(-10px); border-color: var(--neon-cyan); box-shadow: 0 10px 30px rgba(0, 240, 255, 0.25); }
+        .service-card:hover::before { opacity: 1; }
+        .card-icon {
+            width: 60px; height: 60px; background: rgba(255, 0, 122, 0.15); border: 1px solid var(--neon-magenta);
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem; margin-bottom: 1.5rem; color: var(--neon-cyan); box-shadow: 0 0 15px rgba(255, 0, 122, 0.3);
+        }
+        .service-card h3 { font-size: 1.5rem; margin-bottom: 1rem; font-family: var(--font-tech); letter-spacing: 0.5px; }
+        .service-card p { color: var(--text-muted); font-size: 1rem; margin-bottom: 1.5rem; }
+        .service-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+        .tag {
+            background: rgba(0, 240, 255, 0.1); border: 1px solid rgba(0, 240, 255, 0.3);
+            padding: 4px 10px; border-radius: 4px; font-size: 0.82rem; color: var(--neon-cyan);
+            font-family: var(--font-tech); font-weight: 600;
+        }
+
+        /* Perché noi */
+        .stats-section {
+            padding: 4rem 0; background: rgba(255, 0, 122, 0.05);
+            border-top: 1px solid rgba(255, 0, 122, 0.2); border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+            margin: 4rem 0;
+        }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; text-align: center; }
+        .stat-number {
+            font-family: var(--font-tech); font-size: 3.5rem; font-weight: 700;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+            line-height: 1; margin-bottom: 0.5rem;
+        }
+        .stat-label { color: var(--text-muted); font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* Contatti */
+        .contact-section { padding: 8rem 0; }
+        .contact-box {
+            background: var(--bg-card); border: 1px solid var(--border-glow); border-radius: 24px;
+            padding: 4rem; backdrop-filter: blur(16px); max-width: 800px; margin: 0 auto;
+            box-shadow: 0 0 40px rgba(255, 0, 122, 0.15);
+        }
+        .alert { display: none; padding: 1rem 1.2rem; border-radius: 8px; margin-bottom: 2rem; text-align: center; font-weight: 600; }
+        .alert.show { display: block; }
+        .alert-success { background: rgba(0, 240, 255, 0.15); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); }
+        .alert-error { background: rgba(255, 0, 122, 0.15); border: 1px solid var(--neon-magenta); color: #FFD1E6; }
+        .alert-error a { color: var(--neon-cyan); }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+        .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .form-group.full { grid-column: span 2; }
+        label { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        input, select, textarea {
+            background: rgba(10, 9, 21, 0.8); border: 1px solid rgba(255, 0, 122, 0.3);
+            padding: 1rem; border-radius: 8px; color: var(--text-main);
+            font-family: var(--font-main); font-size: 1rem; transition: all 0.3s ease;
+        }
+        select option { background: #0A0915; color: #fff; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--neon-cyan); box-shadow: 0 0 15px rgba(0, 240, 255, 0.4); }
+        .honey { position: absolute; left: -9999px; opacity: 0; height: 0; width: 0; }
+        .privacy-note { margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted); text-align: center; }
+
+        footer { border-top: 1px solid rgba(255, 0, 122, 0.2); padding: 3rem 0; text-align: center; color: var(--text-muted); font-size: 0.9rem; }
+
+        /* Reveal */
+        .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 968px) {
+            .hero-grid { grid-template-columns: 1fr; text-align: center; }
+            .hero-title { font-size: 2.8rem; }
+            .hero-actions { justify-content: center; }
+            .hero-desc { margin-left: auto; margin-right: auto; }
+            .hero-logo img { max-width: 240px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .form-group.full { grid-column: span 1; }
+            .nav-links { display: none; }
+            .contact-box { padding: 2rem; }
+            .section-title { font-size: 2.1rem; }
+            .logo { font-size: 1.3rem; }
+        }
+        @media (max-width: 480px) {
+            .nav-inner .btn-cta { padding: 0.6rem 1rem; font-size: 0.95rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="webgl-container"></div>
+    <div class="bg-overlay"></div>
+
+    <div class="content-wrapper">
+        <!-- Header -->
+        <header>
+            <div class="container nav-inner">
+                <a href="#home" class="logo" aria-label="Fast&Smart Services">
+                    <!-- Carica il file logo.png nella stessa cartella di index.html su GitHub -->
+                    <img src="logo.png" alt="Fast&Smart Services"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                    <span class="logo-fallback"><span class="logo-badge">F&amp;SS</span> Fast&amp;Smart Services</span>
+                </a>
+                <ul class="nav-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#servizi">Servizi</a></li>
+                    <li><a href="#contatti">Contatti</a></li>
+                </ul>
+                <a href="#contatti" class="btn-cta">Richiedi Info</a>
+            </div>
+        </header>
+
+        <!-- Hero -->
+        <section id="home" class="hero">
+            <div class="container">
+                <div class="hero-grid">
+                    <div>
+                        <div class="hero-tag">Consulenza e formazione</div>
+                        <h1 class="hero-title">Consulenze <span class="cyan-text">informatiche</span> e <span class="magenta-text">formazione</span></h1>
+                        <p class="hero-desc">Fast&amp;Smart Services offre consulenze informatiche, formazione online, corsi PES/PAV/PEI secondo la norma CEI 11-27 e corsi sulla sicurezza sul lavoro (D.Lgs. 81/08).</p>
+                        <div class="hero-actions">
+                            <a href="#contatti" class="btn-cta">Contattaci</a>
+                            <a href="#servizi" class="btn-secondary">Servizi</a>
+                        </div>
+                    </div>
+                    <div class="hero-logo">
+                        <img src="logo.png" alt="Logo Fast&Smart Services" onerror="this.parentElement.style.display='none'">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Servizi -->
+        <section id="servizi" class="services-section">
+            <div class="container">
+                <div class="section-header reveal">
+                    <div class="section-subtitle">Servizi</div>
+                    <h2 class="section-title">Cosa offriamo</h2>
+                </div>
+                <div class="services-grid">
+
+                    <div class="service-card reveal">
+                        <div class="card-icon">⚡</div>
+                        <h3>Sicurezza Elettrica PES / PAV / PEI</h3>
+                        <p>Corsi di formazione sul rischio elettrico secondo la norma CEI 11-27 e il D.Lgs. 81/08, per il personale che lavora su impianti elettrici.</p>
+                        <div class="service-tags">
+                            <span class="tag">CEI 11-27</span>
+                            <span class="tag">PES / PAV / PEI</span>
+                            <span class="tag">D.Lgs. 81/08</span>
+                        </div>
+                    </div>
+
+                    <div class="service-card reveal">
+                        <div class="card-icon">💻</div>
+                        <h3>Consulenze Informatiche</h3>
+                        <p>Consulenza informatica per aziende e professionisti: analisi dei sistemi in uso, organizzazione dei processi digitali e supporto tecnico.</p>
+                        <div class="service-tags">
+                            <span class="tag">Sistemi IT</span>
+                            <span class="tag">Processi digitali</span>
+                            <span class="tag">Supporto tecnico</span>
+                        </div>
+                    </div>
+
+                    <div class="service-card reveal">
+                        <div class="card-icon">🎓</div>
+                        <h3>Formazione Online</h3>
+                        <p>Corsi online sulle competenze digitali, rivolti a lavoratori e professionisti.</p>
+                        <div class="service-tags">
+                            <span class="tag">E-learning</span>
+                            <span class="tag">Competenze digitali</span>
+                        </div>
+                    </div>
+
+                    <div class="service-card reveal">
+                        <div class="card-icon">🛡️</div>
+                        <h3>Sicurezza sul Lavoro (D.Lgs. 81/08)</h3>
+                        <p>Corsi e consulenza sulla salute e sicurezza nei luoghi di lavoro, per lavoratori, preposti e dirigenti.</p>
+                        <div class="service-tags">
+                            <span class="tag">Formazione lavoratori</span>
+                            <span class="tag">Preposti</span>
+                            <span class="tag">Dirigenti</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Contatti -->
+        <section id="contatti" class="contact-section">
+            <div class="container">
+                <div class="contact-box reveal">
+                    <div class="section-header" style="margin-bottom: 2rem;">
+                        <div class="section-subtitle">Contatti</div>
+                        <h2 class="section-title">Richiedi informazioni</h2>
+                    </div>
+
+                    <div id="success-alert" class="alert alert-success" role="status">
+                        ✓ Richiesta inviata con successo! Ti ricontatteremo a breve.
+                    </div>
+                    <div id="error-alert" class="alert alert-error" role="alert">
+                        Non è stato possibile inviare la richiesta. Riprova tra poco oppure scrivici direttamente a
+                        <a href="mailto:fastsmartserv@gmail.com">fastsmartserv@gmail.com</a>.
+                    </div>
+
+                    <!-- Il form invia la richiesta via email tramite FormSubmit (nessun server PHP necessario) -->
+                    <form id="contact-form" action="https://formsubmit.co/fastsmartserv@gmail.com" method="POST">
+                        <input type="hidden" name="_subject" value="Nuova richiesta dal sito - Fast&Smart Services">
+                        <input type="hidden" name="_template" value="table">
+                        <input type="hidden" name="_captcha" value="false">
+                        <input type="text" name="_honey" class="honey" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="name">Nome e Cognome / Azienda</label>
+                                <input type="text" id="name" name="Nome" required placeholder="Es. Mario Rossi S.r.l.">
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email di Contatto</label>
+                                <input type="email" id="email" name="email" required placeholder="nome@azienda.it">
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Telefono (facoltativo)</label>
+                                <input type="tel" id="phone" name="Telefono" placeholder="+39 333 1234567">
+                            </div>
+                            <div class="form-group">
+                                <label for="service">Servizio di Interesse</label>
+                                <select id="service" name="Servizio">
+                                    <option value="Formazione PES / PAV / PEI (CEI 11-27)">Formazione PES / PAV / PEI (CEI 11-27)</option>
+                                    <option value="Consulenze Informatiche">Consulenze Informatiche</option>
+                                    <option value="Formazione Online">Formazione Online</option>
+                                    <option value="Sicurezza sul Lavoro D.Lgs. 81/08">Sicurezza sul Lavoro D.Lgs. 81/08</option>
+                                    <option value="Altro / Consulenza generale">Altro / Consulenza generale</option>
+                                </select>
+                            </div>
+                            <div class="form-group full">
+                                <label for="message">Messaggio / Richiesta</label>
+                                <textarea id="message" name="Messaggio" rows="4" required placeholder="Scrivi qui la tua richiesta"></textarea>
+                            </div>
+                        </div>
+                        <button type="submit" id="submit-btn" class="btn-cta" style="width: 100%;">Invia Richiesta</button>
+                        <p class="privacy-note">I dati inseriti vengono usati solo per rispondere alla tua richiesta.</p>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <div class="container">
+                <p>&copy; 2026 Fast&amp;Smart Services. Tutti i diritti riservati.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // ===== Invio form via email (FormSubmit, compatibile con GitHub Pages) =====
+        const form = document.getElementById('contact-form');
+        const btn = document.getElementById('submit-btn');
+        const okBox = document.getElementById('success-alert');
+        const errBox = document.getElementById('error-alert');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            okBox.classList.remove('show');
+            errBox.classList.remove('show');
+            btn.disabled = true;
+            const originalText = btn.textContent;
+            btn.textContent = 'Invio in corso...';
+
+            try {
+                const payload = Object.fromEntries(new FormData(form));
+                const res = await fetch('https://formsubmit.co/ajax/fastsmartserv@gmail.com', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (res.ok && (data.success === true || data.success === 'true')) {
+                    okBox.classList.add('show');
+                    form.reset();
+                    okBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } else {
+                    throw new Error('Invio non riuscito');
+                }
+            } catch (err) {
+                errBox.classList.add('show');
+                errBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        });
+
+        // ===== Comparsa elementi allo scroll =====
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach((en, i) => {
+                if (en.isIntersecting) {
+                    setTimeout(() => en.target.classList.add('visible'), i * 90);
+                    io.unobserve(en.target);
+                }
+            });
+        }, { threshold: 0.12 });
+        document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+        // ===== Sfondo 3D: icosaedro tecnologico + particelle =====
+        const container = document.getElementById('webgl-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 25;
+
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        const geometry = new THREE.IcosahedronGeometry(9, 1);
+        const material = new THREE.MeshBasicMaterial({ color: 0xFF007A, wireframe: true, transparent: true, opacity: 0.35 });
+        const icosahedron = new THREE.Mesh(geometry, material);
+        icosahedron.position.set(12, 0, -5);
+        scene.add(icosahedron);
+
+        const nodesGroup = new THREE.Group();
+        const sphereGeo = new THREE.SphereGeometry(0.3, 8, 8);
+        const sphereMat = new THREE.MeshBasicMaterial({ color: 0x00F0FF });
+        for (let i = 0; i < geometry.attributes.position.count; i++) {
+            const sphere = new THREE.Mesh(sphereGeo, sphereMat);
+            sphere.position.set(
+                geometry.attributes.position.getX(i),
+                geometry.attributes.position.getY(i),
+                geometry.attributes.position.getZ(i)
+            );
+            nodesGroup.add(sphere);
+        }
+        nodesGroup.position.set(12, 0, -5);
+        scene.add(nodesGroup);
+
+        const particlesCount = 800;
+        const positions = new Float32Array(particlesCount * 3);
+        for (let i = 0; i < particlesCount * 3; i++) positions[i] = (Math.random() - 0.5) * 90;
+        const particlesGeometry = new THREE.BufferGeometry();
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        const particlesMaterial = new THREE.PointsMaterial({ color: 0x00F0FF, size: 0.5, transparent: true, opacity: 0.7 });
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
+
+        let mouseX = 0, mouseY = 0;
+        window.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX / window.innerWidth - 0.5) * 2;
+            mouseY = (event.clientY / window.innerHeight - 0.5) * 2;
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            icosahedron.rotation.x += 0.004;
+            icosahedron.rotation.y += 0.006;
+            nodesGroup.rotation.x += 0.004;
+            nodesGroup.rotation.y += 0.006;
+            particlesMesh.rotation.y += 0.0008;
+            camera.position.x += (mouseX * 4 - camera.position.x) * 0.05;
+            camera.position.y += (-mouseY * 4 - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
