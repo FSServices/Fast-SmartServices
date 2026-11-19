@@ -63,7 +63,7 @@
             font-family: var(--font-tech); font-size: 1.7rem; font-weight: 700;
             text-decoration: none; color: var(--text-main); letter-spacing: 1px;
         }
-        .logo img { height: 46px; width: auto; border-radius: 10px; display: block; box-shadow: 0 0 14px rgba(0,240,255,0.35); }
+        .logo img { height: 50px; width: auto; border-radius: 50%; display: block; box-shadow: 0 0 14px rgba(0,240,255,0.35); }
         .logo-fallback { display: none; align-items: center; gap: 12px; }
         .logo-badge {
             background: linear-gradient(135deg, var(--neon-magenta), var(--neon-cyan));
@@ -112,9 +112,8 @@
 
         .hero-logo { display: flex; justify-content: center; }
         .hero-logo img {
-            width: 100%; max-width: 380px; border-radius: 32px;
+            width: 100%; max-width: 380px; border-radius: 50%;
             box-shadow: 0 0 40px rgba(0, 240, 255, 0.35), 0 0 80px rgba(255, 0, 122, 0.25);
-            border: 1px solid rgba(0, 240, 255, 0.4);
             animation: floaty 6s ease-in-out infinite;
         }
         @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
@@ -186,13 +185,15 @@
         .alert-error a { color: var(--neon-cyan); }
 
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
-        .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .form-grid > * { min-width: 0; }
+        .form-group { display: flex; flex-direction: column; gap: 0.5rem; min-width: 0; }
         .form-group.full { grid-column: span 2; }
         label { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
         input, select, textarea {
             background: rgba(10, 9, 21, 0.8); border: 1px solid rgba(255, 0, 122, 0.3);
             padding: 1rem; border-radius: 8px; color: var(--text-main);
             font-family: var(--font-main); font-size: 1rem; transition: all 0.3s ease;
+            width: 100%; max-width: 100%;
         }
         select option { background: #0A0915; color: #fff; }
         input:focus, select:focus, textarea:focus { outline: none; border-color: var(--neon-cyan); box-shadow: 0 0 15px rgba(0, 240, 255, 0.4); }
@@ -335,13 +336,10 @@
                     <div id="success-alert" class="alert alert-success" role="status">
                         ✓ Richiesta inviata con successo! Ti ricontatteremo a breve.
                     </div>
-                    <div id="error-alert" class="alert alert-error" role="alert">
-                        Non è stato possibile inviare la richiesta. Riprova tra poco oppure scrivici direttamente a
-                        <a href="mailto:fastsmartserv@gmail.com">fastsmartserv@gmail.com</a>.
-                    </div>
 
                     <!-- Il form invia la richiesta via email tramite FormSubmit (nessun server PHP necessario) -->
-                    <form id="contact-form" action="https://formsubmit.co/fastsmartserv@gmail.com" method="POST">
+                    <form id="contact-form" action="https://formsubmit.co/b678cca566ee796767ddf2d5bc3f35b3" method="POST">
+                        <input type="hidden" name="_next" value="https://fsservices.github.io/Fast-SmartServices/?status=success#contatti">
                         <input type="hidden" name="_subject" value="Nuova richiesta dal sito - Fast&Smart Services">
                         <input type="hidden" name="_template" value="table">
                         <input type="hidden" name="_captcha" value="false">
@@ -384,48 +382,22 @@
 
         <footer>
             <div class="container">
-                <p>&copy; 2026 Fast&amp;Smart Services. Tutti i diritti riservati.</p>
+                <p>&copy; 2026 Fast&amp;Smart Services &mdash; Federica Capaldini. Tutti i diritti riservati.</p>
             </div>
         </footer>
     </div>
 
     <script>
         // ===== Invio form via email (FormSubmit, compatibile con GitHub Pages) =====
+        // Dopo l'invio FormSubmit riporta qui con ?status=success: mostra la conferma
         const form = document.getElementById('contact-form');
         const btn = document.getElementById('submit-btn');
-        const okBox = document.getElementById('success-alert');
-        const errBox = document.getElementById('error-alert');
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            okBox.classList.remove('show');
-            errBox.classList.remove('show');
+        if (window.location.search.includes('status=success')) {
+            document.getElementById('success-alert').classList.add('show');
+        }
+        form.addEventListener('submit', () => {
             btn.disabled = true;
-            const originalText = btn.textContent;
             btn.textContent = 'Invio in corso...';
-
-            try {
-                const payload = Object.fromEntries(new FormData(form));
-                const res = await fetch('https://formsubmit.co/ajax/fastsmartserv@gmail.com', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const data = await res.json();
-                if (res.ok && (data.success === true || data.success === 'true')) {
-                    okBox.classList.add('show');
-                    form.reset();
-                    okBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                } else {
-                    throw new Error('Invio non riuscito');
-                }
-            } catch (err) {
-                errBox.classList.add('show');
-                errBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            } finally {
-                btn.disabled = false;
-                btn.textContent = originalText;
-            }
         });
 
         // ===== Comparsa elementi allo scroll =====
